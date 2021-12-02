@@ -25,7 +25,10 @@ def debug(*args, **kwargs):
 
 
 def run(*args, **kwargs):
-    debug("run: " + " ".join(args))
+    if 'cwd' in kwargs:
+        debug("run: ( cd " + kwargs['cwd'] + " && " + " ".join(args[0]) + " )")
+    else:
+        debug("run: " + " ".join(args[0]))
     kwargs_default = {
         check: True,
         stdin: DEVNULL,
