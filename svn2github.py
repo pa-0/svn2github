@@ -136,12 +136,12 @@ def sync_github_mirror(github_repo, cache_dir, new_svn_url=None):
             print("Everything up to date. Bye!")
             return
 
-        print("Fetching from SVN", end="")
+        print("Fetching from SVN")
         if not cached or new_svn_url:
             git_svn_init(git_svn_info, git_dir)
 
         for rev in git_svn_fetch(git_dir):
-            print("\rFetching from SVN, revision {}/{}".format(rev, upstream_revision), end="")
+            print("Fetching from SVN, revision {}/{}".format(rev, upstream_revision))
         print()
 
         print("Rebasing SVN changes")
