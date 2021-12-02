@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import subprocess as proc
+import subprocess
 from subprocess import DEVNULL, PIPE, Popen
 import re
 from collections import namedtuple
@@ -24,11 +24,20 @@ def debug(*args, **kwargs):
     print(*args, **kwargs)
 
 
+def run(*args, **kwargs):
+    debug("run: " + " ".join(args))
+    kwargs_default = {
+        check: True,
+        stdin: DEVNULL,
+        stdout: PIPE
+    }
+    kwargs = {**kwargs_default, **kwargs}
+    return subprocess.run(*args, **kwargs)
+
+
 def get_last_revision_from_svn(svn_url):
     args = ["svn", "info", svn_url, "--no-newline", "--show-item", "revision"]
-    debug("run: " + " ".join(args))
-    result = proc.run(args, check=True, stdin=DEVNULL, stdout=PIPE)
-
+    result = run(args)
     rev = int (result.stdout.decode().strip())
     if rev:
         return rev
@@ -38,14 +47,13 @@ def get_last_revision_from_svn(svn_url):
 
 def run_git_cmd(args, git_dir):
     args = ["git"] + args
-    debug("run: " + " ".join(args))
-    return proc.run(args, check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
+    
+    return run(args, cwd=git_dir)
 
 
 def is_repo_empty(git_dir):
     args = ["ls", ".git/refs/heads"]
-    debug("run: " + " ".join(args))
-    result = proc.run(args, check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
+    result = run(args, cwd=git_dir)
     return len(result.stdout) == 0
 
 
@@ -75,7 +83,7 @@ def git_svn_rebase(git_dir):
 
 
 def git_svn_fetch(git_dir):
-    cmd = Popen(["git", "svn", "fetch"], cwd=git_dir, stdin=DEVNULL, stdout=PIPE, universal_newlines=True)
+    cmd = Popen(["git", "svn", "fetch"], cwd=git_dir, universal_newlines=True)
 
     pattern = re.compile("^r([0-9]+) = [0-9a-f]{40}")
 
@@ -101,8 +109,8 @@ def unpack_cache(cache_path, git_dir):
     dot_git_dir = os.path.join(git_dir, ".git")
     os.makedirs(dot_git_dir, exist_ok=False)
     args = ["tar", "-xf", cache_path]
-    debug("run: " + " ".join(args))
-    proc.run(args, check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
+    
+    run(args, cwd=dot_git_dir) # , stdout=DEVNULL
     run_git_cmd(["config", "core.bare", "false"], git_dir)
     run_git_cmd(["checkout", "."], git_dir)
 
@@ -110,8 +118,8 @@ def unpack_cache(cache_path, git_dir):
 def save_cache(cache_path, tmp_path, git_dir):
     dot_git_dir = os.path.join(git_dir, ".git")
     args = ["tar", "-cf", tmp_path, "."]
-    debug("run: " + " ".join(args))
-    proc.run(args, check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
+    
+    run(args, cwd=dot_git_dir) # , stdout=DEVNULL
     shutil.copyfile(tmp_path, cache_path)
 
 
