@@ -20,8 +20,14 @@ class Svn2GithubException(Exception):
 GitSvnInfo = namedtuple('GitSvnInfo', 'svn_url svn_revision svn_uuid')
 
 
+def debug(*args, **kwargs):
+    print(*args, **kwargs)
+
+
 def get_last_revision_from_svn(svn_url):
-    result = proc.run(["svn", "info", svn_url, "--no-newline", "--show-item", "revision"], check=True, stdin=DEVNULL, stdout=PIPE)
+    args = ["svn", "info", svn_url, "--no-newline", "--show-item", "revision"]
+    debug("run: " + " ".join(args))
+    result = proc.run(args, check=True, stdin=DEVNULL, stdout=PIPE)
 
     rev = int (result.stdout.decode().strip())
     if rev:
@@ -31,11 +37,15 @@ def get_last_revision_from_svn(svn_url):
 
 
 def run_git_cmd(args, git_dir):
-    return proc.run(["git"] + args, check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
+    args = ["git"] + args
+    debug("run: " + " ".join(args))
+    return proc.run(args, check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
 
 
 def is_repo_empty(git_dir):
-    result = proc.run(["ls", ".git/refs/heads"], check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
+    args = ["ls", ".git/refs/heads"]
+    debug("run: " + " ".join(args))
+    result = proc.run(args, check=True, cwd=git_dir, stdin=DEVNULL, stdout=PIPE)
     return len(result.stdout) == 0
 
 
@@ -90,14 +100,18 @@ def git_push(git_dir):
 def unpack_cache(cache_path, git_dir):
     dot_git_dir = os.path.join(git_dir, ".git")
     os.makedirs(dot_git_dir, exist_ok=False)
-    proc.run(["tar", "-xf", cache_path], check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
+    args = ["tar", "-xf", cache_path]
+    debug("run: " + " ".join(args))
+    proc.run(args, check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
     run_git_cmd(["config", "core.bare", "false"], git_dir)
     run_git_cmd(["checkout", "."], git_dir)
 
 
 def save_cache(cache_path, tmp_path, git_dir):
     dot_git_dir = os.path.join(git_dir, ".git")
-    proc.run(["tar", "-cf", tmp_path, "."], check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
+    args = ["tar", "-cf", tmp_path, "."]
+    debug("run: " + " ".join(args))
+    proc.run(args, check=True, cwd=dot_git_dir, stdin=DEVNULL, stdout=DEVNULL)
     shutil.copyfile(tmp_path, cache_path)
 
 
