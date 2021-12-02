@@ -23,17 +23,34 @@ def debug(*args, **kwargs):
     print(*args, **kwargs)
 
 
+run_kwargs_default = {
+    'check': True,
+    'stdin': subprocess.DEVNULL,
+    'stdout': subprocess.PIPE
+}
+
+
+popen_kwargs_default = {
+    'stdin': subprocess.DEVNULL,
+    'stdout': subprocess.PIPE
+}
+
+
+def popen(*args, **kwargs):
+    if 'cwd' in kwargs:
+        debug("run: ( cd " + kwargs['cwd'] + " && " + " ".join(args[0]) + " )")
+    else:
+        debug("run: " + " ".join(args[0]))
+    kwargs = {**popen_kwargs_default, **kwargs}
+    return subprocess.Popen(*args, **kwargs)
+
+
 def run(*args, **kwargs):
     if 'cwd' in kwargs:
         debug("run: ( cd " + kwargs['cwd'] + " && " + " ".join(args[0]) + " )")
     else:
         debug("run: " + " ".join(args[0]))
-    kwargs_default = {
-        'check': True,
-        'stdin': subprocess.DEVNULL,
-        'stdout': subprocess.PIPE
-    }
-    kwargs = {**kwargs_default, **kwargs}
+    kwargs = {**run_kwargs_default, **kwargs}
     return subprocess.run(*args, **kwargs)
 
 
@@ -84,7 +101,9 @@ def git_svn_rebase(git_dir):
 
 
 def git_svn_fetch(git_dir):
-    cmd = subprocess.Popen(["git", "svn", "fetch"], cwd=git_dir, universal_newlines=True)
+    args = ["git", "svn", "fetch"]
+    print("run: ( cd "+git_dir+" && "+" ".join(args)+" )")
+    cmd = popen(args, cwd=git_dir, universal_newlines=True)
 
     pattern = re.compile("^r([0-9]+) = [0-9a-f]{40}")
 
