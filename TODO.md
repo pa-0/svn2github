@@ -21,6 +21,10 @@ features:
   this probably works only for the first conversion
   and not for incremental updates
   as it creates an empty git repo on every run (?)
+* keep original commit messages, do not add git-svn-id to every commit message
+  * store svn revisions as git tags
+* convert emails to the original svn server domain
+  * example: domain svn.jdownloader.org -> email somegituser@jdownloader.org
 
 todo implement
 * automatic upload to sourceforge.net
