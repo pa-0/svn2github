@@ -1,0 +1,22 @@
+create repository jdownloader/.git
+end repository
+
+# NOTE
+# here we use
+# "repository jdownloader/.git" not
+# "repository jdownloader"
+# as svn-all-fast-export creates bare git repos
+# = produces only the .git folder
+# this is just a workaround
+# and should be implemented in svn2github.py
+# see also: git config core.bare false
+
+match /
+  repository jdownloader/.git
+  branch main
+end match
+
+match /(branches|tags)/([^/]+)/
+  repository jdownloader/.git
+  branch \2
+end match

@@ -1,0 +1,44 @@
+{
+  "name": "jdownloader",
+  "description": "mirror of the jdownloader monorepo",
+  "generator": "https://github.com/milahu/svn2github",
+  "layout": {
+    "trunk": true,
+    "browser": true,
+    "MyJDownloaderClient": true
+  },
+  "repos": [
+    {
+      "type": "svn",
+      "original": true,
+      "uuid": "ebf7c1c2-ba36-0410-9fe8-c592906822b4",
+      "remotes": [
+        {
+          "url": "svn://svn.jdownloader.org/jdownloader"
+        }
+      ]
+    },
+    {
+      "type": "svn",
+      "write": true,
+      "remotes": [
+        {
+          "url": "svn://svn.code.sf.net/p/jdownloader-svn-mirror-milahu/code/"
+        }
+      ]
+    },
+    {
+      "type": "git",
+      "write": true,
+      "branches": {
+        "main": "main",
+        "svn2git": "svn2git"
+      },
+      "remotes": [
+        {
+          "url": "https://github.com/milahu/jdownloader"
+        }
+      ]
+    }
+  ]
+}
